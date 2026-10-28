@@ -1,504 +1,357 @@
-{% load static %}
 <!doctype html>
 <html lang="de">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Django Unchained</title>
-    <script src="https://code.responsivevoice.org/responsivevoice.js?key=R3bT9HEV"></script>
     <style>
       :root {
-        --ink: #0b0907;
-        --panel: #16110d;
-        --line: #000;
-        --cream: #f2e6cc;
-        --red: #d62c2c;
-        --amber: #e8a13a;
-        --sky: #1b3a5c;
+        --bg: #0b0d14;
+        --card: #161925;
+        --card2: #1c2030;
+        --border: #2a2f42;
+        --text: #e8eaf2;
+        --muted: #a0a6bd;
+        --accent: #ffd43b;
+        --accent2: #4b8bbe;
+        --ok: #3ecf8e;
+        --err: #ef5a5a;
+        --mono: "Consolas", "Menlo", monospace;
       }
       * {
         box-sizing: border-box;
       }
       body {
-        margin: 0;
-        background: #0b0907;
-        color: var(--cream);
-        font-family: Arial, sans-serif;
-        min-height: 100vh;
-        padding: 12px;
-      }
-      .page {
-        max-width: 1240px;
+        font-family: -apple-system, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(
+            ellipse at top left,
+            rgba(75, 139, 190, 0.18),
+            transparent 55%
+          ),
+          radial-gradient(
+            ellipse at top right,
+            rgba(255, 212, 59, 0.1),
+            transparent 50%
+          ),
+          var(--bg);
+        background-attachment: fixed;
+        color: var(--text);
+        max-width: 860px;
         margin: 0 auto;
-        display: grid;
-        gap: 8px;
+        padding: 2rem 1.2rem 5rem;
+        line-height: 1.5;
       }
-
-      .panel {
-        position: relative;
-        background: var(--panel);
-        border: 6px solid var(--line);
-        padding: 18px;
+      header {
+        background: linear-gradient(135deg, var(--card2), var(--card));
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.6rem 1.8rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+      }
+      h1 {
+        font-size: 2rem;
+        margin: 0 0 0.3rem;
+        letter-spacing: -0.01em;
+      }
+      h1 .dot1 {
+        color: var(--accent2);
+      }
+      h1 .dot2 {
+        color: var(--accent);
+      }
+      #status {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin: 0 0 1rem;
+      }
+      .fortschritt {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+      }
+      .balken-bg {
+        flex: 1;
+        height: 10px;
+        background: #0b0d14;
+        border: 1px solid var(--border);
+        border-radius: 99px;
         overflow: hidden;
       }
-      .panel::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        background: radial-gradient(rgba(0, 0, 0, 0.6) 1px, transparent 1px) 0
-          0 / 5px 5px;
-        opacity: 0.35;
+      #balken {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, var(--accent2), var(--ok));
+        border-radius: 99px;
+        transition: width 0.4s ease;
       }
-      .panel > * {
-        position: relative;
-      }
-
-      .hero {
-        min-height: 260px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        align-items: center;
-        background: linear-gradient(120deg, #2b1a10, #0f1c2b 70%);
-      }
-      .hero h1 {
-        font-family: Impact, "Arial Black", sans-serif;
-        font-size: 96px;
-        line-height: 0.9;
-        margin: 0;
-        color: var(--cream);
-        letter-spacing: 1px;
-        text-align: right;
-      }
-      .hero h1 em {
-        display: block;
-        font-style: normal;
-        color: var(--red);
-        font-size: 84px;
-      }
-      .hero .tag {
-        font-family: "Courier New", monospace;
-        color: #c9b893;
-        text-align: right;
-        margin-top: 12px;
-      }
-      .hero .bubble {
-        font-family: "Comic Sans MS", "Segoe Print", cursive;
-        font-size: 30px;
-        font-weight: bold;
-        color: #111;
-        background: #fff;
-        border-radius: 22px;
-        padding: 16px 22px;
-        box-shadow: 6px 6px 0 #000;
-        max-width: 320px;
-        transform: rotate(-3deg);
-      }
-      .hero .bubble small {
-        display: block;
-        font-size: 20px;
-        font-weight: normal;
+      #zaehler {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--muted);
+        white-space: nowrap;
       }
 
-      .row {
-        display: grid;
-        gap: 8px;
-      }
-      .row-3 {
-        grid-template-columns: 1fr 1fr 1fr;
-      }
-      .row-2 {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .caption {
-        position: absolute;
-        top: 0;
-        left: 0;
-        background: var(--amber);
-        color: #000;
-        padding: 4px 10px;
-        border-right: 4px solid #000;
-        border-bottom: 4px solid #000;
-        font-family: Impact, sans-serif;
-        font-size: 16px;
-        text-transform: uppercase;
-        z-index: 2;
-      }
-
-      .speech {
-        font-family: "Comic Sans MS", "Segoe Print", cursive;
-        font-size: 22px;
-        font-weight: bold;
-        color: #111;
-        background: #fff;
-        border: 4px solid #000;
-        border-radius: 18px;
-        padding: 12px 16px;
-        margin: 36px 0 0;
-        line-height: 1.2;
-      }
-      .speech.dark {
-        background: #fff;
-        color: #111;
-      }
-
-      .chapters {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 12px;
-        margin-top: 30px;
-      }
-      .chapter-panel {
-        text-align: left;
-        background: #0f0b08;
-        color: var(--cream);
-        border: 4px solid #000;
-        padding: 14px;
-        cursor: pointer;
-        box-shadow: 6px 6px 0 #000;
-        font-family: inherit;
-        min-height: 120px;
-      }
-      .chapter-panel:hover {
-        background: #2a1d14;
-        transform: translate(-2px, -2px);
-        box-shadow: 8px 8px 0 var(--red);
-      }
-      .chapter-panel .num {
-        font-family: Impact, sans-serif;
-        color: var(--red);
-        font-size: 18px;
-      }
-      .chapter-panel .name {
-        font-family: Impact, sans-serif;
-        font-size: 20px;
-        text-transform: uppercase;
-        margin-top: 4px;
-      }
-      .chapter-panel .diff {
-        display: inline-block;
-        margin-top: 8px;
-        font-size: 11px;
-        text-transform: uppercase;
-        background: var(--sky);
-        padding: 2px 6px;
-        border: 2px solid #000;
-      }
-      .section-title {
-        font-family: Impact, sans-serif;
-        font-size: 26px;
-        text-transform: uppercase;
-        margin: 22px 0 0;
-        color: var(--amber);
-      }
-
-      .ask-form {
+      .kapitel {
         display: flex;
-        gap: 8px;
-        margin-top: 30px;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 1.25rem;
+        margin: 2.4rem 0 1.1rem;
+        color: var(--accent);
       }
-      .ask-form input {
+      .kapitel::after {
+        content: "";
         flex: 1;
-        padding: 12px;
-        border: 4px solid #000;
-        background: #fff;
-        font-family: inherit;
-        font-size: 16px;
-      }
-      .ask-form button {
-        padding: 12px 18px;
-        background: var(--red);
-        color: #fff;
-        border: 4px solid #000;
-        font-family: Impact, sans-serif;
-        font-size: 18px;
-        text-transform: uppercase;
-        cursor: pointer;
-        box-shadow: 4px 4px 0 #000;
-      }
-      .mute {
-        margin-top: 10px;
-        background: #333;
-        color: #fff;
-        border: 4px solid #000;
-        padding: 8px 12px;
-        cursor: pointer;
-        font-family: Impact, sans-serif;
-        text-transform: uppercase;
+        height: 1px;
+        background: linear-gradient(90deg, var(--border), transparent);
       }
 
-      .quote {
-        font-family: "Comic Sans MS", "Segoe Print", cursive;
-        font-size: 30px;
-        font-weight: bold;
-        color: var(--cream);
-        text-align: center;
+      .aufgabe {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--accent2);
+        border-radius: 14px;
+        padding: 1.2rem 1.4rem;
+        margin-bottom: 1.2rem;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+        transition:
+          border-color 0.25s,
+          transform 0.2s;
+      }
+      .aufgabe:hover {
+        transform: translateY(-1px);
+      }
+      .aufgabe.geloest {
+        border-left-color: var(--ok);
+      }
+      .kopf {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 0.6rem;
+        cursor: pointer;
+      }
+      .badge {
+        flex: none;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: var(--accent2);
+        color: #0b0d14;
+        font-weight: 700;
+        font-size: 0.95rem;
+      }
+      .geloest .badge {
+        background: var(--ok);
+      }
+      h2 {
+        flex: 1;
+        font-size: 1.1rem;
         margin: 0;
-        padding-top: 40px;
-        line-height: 1.2;
       }
-      .quote small {
+      .stufe {
+        font-size: 0.75rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .haken {
+        display: none;
+        color: var(--ok);
+        font-weight: 700;
+        font-size: 1.2rem;
+      }
+      .geloest .haken {
         display: block;
-        font-size: 22px;
-        margin-top: 8px;
-        color: var(--amber);
       }
 
-      .burst {
-        position: fixed;
-        left: 50%;
-        top: 40%;
-        transform: translate(-50%, -50%) scale(0.6);
-        font-family: Impact, sans-serif;
-        font-size: 140px;
-        color: var(--amber);
-        text-shadow: 6px 6px 0 #000;
-        opacity: 0;
-        pointer-events: none;
-        z-index: 10;
+      .inhalt {
+        display: none;
+        margin-top: 0.6rem;
       }
-      .burst.on {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-        transition: all 0.12s;
+      .aufgabe.offen .inhalt {
+        display: block;
       }
-      .shake {
-        animation: shake 0.35s;
+      .erklaerung {
+        background: #11141f;
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        color: var(--muted);
+        margin-bottom: 1rem;
       }
-      @keyframes shake {
-        0%,
-        100% {
-          transform: translateX(0);
-        }
-        25% {
-          transform: translateX(-8px);
-        }
-        75% {
-          transform: translateX(8px);
-        }
+      textarea {
+        width: 100%;
+        min-height: 140px;
+        font-family: var(--mono);
+        font-size: 14px;
+        background: #0a0c12;
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 0.9rem 1rem;
+        line-height: 1.55;
+        resize: vertical;
+        tab-size: 4;
       }
-
-      @media (max-width: 900px) {
-        .hero {
-          grid-template-columns: 1fr;
-        }
-        .hero h1 {
-          font-size: 64px;
-          text-align: left;
-        }
-        .hero h1 em {
-          font-size: 56px;
-        }
-        .hero .tag {
-          text-align: left;
-        }
-        .row-3,
-        .row-2 {
-          grid-template-columns: 1fr;
-        }
+      textarea:focus {
+        outline: none;
+        border-color: var(--accent2);
+        box-shadow: 0 0 0 3px rgba(75, 139, 190, 0.25);
+      }
+      button.run {
+        background: linear-gradient(135deg, var(--accent2), #3a73a0);
+        color: #fff;
+        border: none;
+        padding: 0.65rem 1.3rem;
+        border-radius: 9px;
+        cursor: pointer;
+        margin-top: 0.8rem;
+        font-weight: 600;
+        font-size: 0.92rem;
+        box-shadow: 0 3px 10px rgba(75, 139, 190, 0.3);
+      }
+      button.run:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      pre.ausgabe {
+        background: #0a0c12;
+        border: 1px solid var(--border);
+        padding: 0.8rem 1rem;
+        border-radius: 10px;
+        white-space: pre-wrap;
+        font-family: var(--mono);
+        font-size: 13.5px;
+        margin: 0.7rem 0 0;
+        min-height: 2.5rem;
+      }
+      pre.ausgabe.fehler {
+        color: var(--err);
+      }
+      pre.ausgabe:empty {
+        display: none;
       }
     </style>
   </head>
   <body>
-    <div class="page">
-      <header class="panel hero" id="hero">
-        <span class="caption">Titel</span>
-        <div>
-          <div class="bubble" id="bubble">
-            ICH BIN ICH.<small>UND WIEDERHOLE MICH NICHT.</small>
-          </div>
-        </div>
-        <div>
-          <h1>DJANGO<em>UNCHAINED</em></h1>
-          <p class="tag">
-            Nicht Django.<br />Nur bessere Models.<br />Und mehr Freiheit.
-          </p>
-        </div>
-      </header>
-
-      <div class="row row-3">
-        <section class="panel" id="panel-1">
-          <span class="caption">Kapitel</span>
-          <div class="speech" id="speech-1">
-            Klick ein Kapitel an. Ich erkläre es dir.
-          </div>
-        </section>
-        <section class="panel" id="panel-2">
-          <span class="caption">Erklärung</span>
-          <div class="speech" id="speech-2">
-            Hier steht, was das Kapitel sagt.
-          </div>
-        </section>
-        <section class="panel" id="panel-3">
-          <span class="caption">Frage</span>
-          <div class="speech" id="speech-3">Stell mir eine Frage zum Kurs.</div>
-        </section>
+    <header>
+      <h1>
+        <span class="dot1">&lt;</span>Django Unchained<span class="dot2"
+          >&gt;</span
+        >
+      </h1>
+      <p id="status">Python wird geladen …</p>
+      <div class="fortschritt">
+        <div class="balken-bg"><div id="balken"></div></div>
+        <span id="zaehler">0 von 0 gelöst</span>
       </div>
+    </header>
+    <div id="aufgaben"></div>
 
-      <section class="panel">
-        <span class="caption">Kurs</span>
-        <div class="section-title" id="sections"></div>
-        <div class="chapters" id="chapters"></div>
-      </section>
-
-      <section class="panel">
-        <span class="caption">Dein Wort</span>
-        <form class="ask-form" id="ask">
-          <input name="q" placeholder="Frag zum Kurs" autocomplete="off" />
-          <button type="submit">Fragen</button>
-        </form>
-        <button class="mute" id="mute" type="button">Ton aus</button>
-      </section>
-
-      <section class="panel">
-        <span class="caption">Lebenseinstellung</span>
-        <p class="quote" id="quote">
-          DRY IST KEINE SÜNDE.<small>ES IST EINE LEBENSEINSTELLUNG.</small>
-        </p>
-      </section>
-    </div>
-
-    <div class="burst" id="burst">PEW!</div>
-
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.js"></script>
     <script>
-      const bubble = document.getElementById("bubble");
-      const chaptersEl = document.getElementById("chapters");
-      const sectionsEl = document.getElementById("sections");
-      const speech1 = document.getElementById("speech-1");
-      const speech2 = document.getElementById("speech-2");
-      const speech3 = document.getElementById("speech-3");
-      const burst = document.getElementById("burst");
-      const muteBtn = document.getElementById("mute");
-      const quote = document.getElementById("quote");
-      const hero = document.getElementById("hero");
-      const STOP = new Set([
-        "der",
-        "die",
-        "das",
-        "und",
-        "ist",
-        "ein",
-        "eine",
-        "wie",
-        "was",
-        "wann",
-        "mit",
-        "für",
-        "von",
-        "den",
-        "dem",
-        "zum",
-        "zur",
-        "bei",
-        "auf",
-        "aus",
-        "man",
-        "ich",
-        "mir",
-        "mich",
-        "dir",
-        "bin",
-        "wird",
-        "werden",
-        "kann",
-      ]);
-      const SAYINGS = [
-        "MEIN CODE. MEINE REGELN. KEINE KETTEN.",
-        "SCHEMATISCH IST SCHÖN. ABER ECHTE FREIHEIT LIEGT IN SAUBEREM CODE.",
-        "DRY IST KEINE SÜNDE. ES IST EINE LEBENSEINSTELLUNG.",
-        "KEIN CHAOS. NUR KONTROLLE.",
-        "FLEXIBEL. SKALIERBAR. DJANGO.",
-        "UND WENN'S MAL HÄNGT… GIT PUSH UND WEITER.",
-      ];
-      let chapters = [];
-      let muted = false;
-      let sayingIndex = 0;
+      const aufgabenEl = document.getElementById("aufgaben");
+      const statusEl = document.getElementById("status");
+      const balkenEl = document.getElementById("balken");
+      const zaehlerEl = document.getElementById("zaehler");
+      let py = null;
+      let gelöst = new Set();
+      let gesamt = 0;
 
-      function speak(text) {
-        if (muted) return;
-        if (typeof responsiveVoice !== "undefined") {
-          responsiveVoice.speak(text, "Deutsch Male", { rate: 1, pitch: 0.8 });
-        } else if ("speechSynthesis" in window) {
-          speechSynthesis.cancel();
-          speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+      function aktualisiereFortschritt() {
+        balkenEl.style.width = gesamt
+          ? (gelöst.size / gesamt) * 100 + "%"
+          : "0%";
+        zaehlerEl.textContent = gelöst.size + " von " + gesamt + " gelöst";
+      }
+
+      async function ladePython() {
+        py = await loadPyodide();
+        statusEl.textContent = "Python bereit. Wähl eine Aufgabe.";
+      }
+
+      async function laufen(code, ausgabeEl, karte) {
+        ausgabeEl.classList.remove("fehler");
+        ausgabeEl.textContent = "";
+        try {
+          py.runPython(
+            `import sys, io\nsys.stdout = io.StringIO()\nsys.stderr = sys.stdout`,
+          );
+          py.runPython(code);
+          ausgabeEl.textContent =
+            py.runPython("sys.stdout.getvalue()") || "(keine Ausgabe)";
+          karte.classList.add("geloest");
+          gelöst.add(karte.dataset.id);
+          aktualisiereFortschritt();
+        } catch (err) {
+          ausgabeEl.classList.add("fehler");
+          ausgabeEl.textContent = String(err).split("\n").slice(-3).join("\n");
+        } finally {
+          py.runPython(
+            "sys.stdout = sys.__stdout__; sys.stderr = sys.__stderr__",
+          );
         }
       }
 
-      function gunshot() {
-        if (muted) return;
-        try {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
-          const buf = ctx.createBuffer(1, ctx.sampleRate * 0.3, ctx.sampleRate);
-          const d = buf.getChannelData(0);
-          for (let i = 0; i < d.length; i++)
-            d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
-          const src = ctx.createBufferSource();
-          src.buffer = buf;
-          src.connect(ctx.destination);
-          src.start();
-        } catch (e) {}
-      }
+      function baueKarte(item, nummer) {
+        const karte = document.createElement("section");
+        karte.className = "aufgabe";
+        karte.dataset.id = item.id;
 
-      function say(el, text) {
-        el.textContent = text;
-        speak(text);
-      }
+        const kopf = document.createElement("div");
+        kopf.className = "kopf";
+        kopf.innerHTML =
+          '<span class="badge"></span><h2></h2><span class="stufe"></span><span class="haken">✓</span>';
+        kopf.querySelector(".badge").textContent = nummer;
+        kopf.querySelector("h2").textContent = item.title;
+        kopf.querySelector(".stufe").textContent = item.difficulty;
+        kopf.addEventListener("click", () => karte.classList.toggle("offen"));
 
-      function shoot(el, text) {
-        el.classList.remove("shake");
-        void el.offsetWidth;
-        el.classList.add("shake");
-        burst.classList.add("on");
-        gunshot();
-        say(el, text);
-        setTimeout(() => burst.classList.remove("on"), 300);
-      }
+        const inhalt = document.createElement("div");
+        inhalt.className = "inhalt";
+        const erklaerung = document.createElement("div");
+        erklaerung.className = "erklaerung";
+        erklaerung.textContent = item.description;
+        const code = document.createElement("textarea");
+        code.placeholder = "Dein Python-Code …";
+        const ausfuehren = document.createElement("button");
+        ausfuehren.className = "run";
+        ausfuehren.textContent = "Ausführen";
+        const ausgabe = document.createElement("pre");
+        ausgabe.className = "ausgabe";
 
-      function words(s) {
-        return s
-          .toLowerCase()
-          .replace(/[^a-zäöüß0-9\s-]/g, " ")
-          .split(/\s+/)
-          .filter((w) => w.length > 2 && !STOP.has(w));
-      }
+        ausfuehren.addEventListener("click", () =>
+          laufen(code.value, ausgabe, karte),
+        );
 
-      function findAnswer(q) {
-        const qw = words(q);
-        let best = null;
-        let score = 0;
-        chapters.forEach((c) => {
-          const cw = new Set(words(c.title + " " + c.description));
-          const s = qw.filter((w) => cw.has(w)).length;
-          if (s > score) {
-            score = s;
-            best = c;
-          }
-        });
-        return best;
+        inhalt.append(erklaerung, code, ausfuehren, ausgabe);
+        karte.append(kopf, inhalt);
+        return karte;
       }
 
       function render(list) {
-        chapters = list;
-        let current = "";
-        list.forEach((item, i) => {
-          if (item.section !== current) {
-            current = item.section;
-            const h = document.createElement("div");
-            h.className = "section-title";
-            h.textContent = current;
-            chaptersEl.parentElement.insertBefore(h, chaptersEl);
+        let aktuell = "";
+        let nummer = 0;
+        list.forEach((item) => {
+          if (item.section !== aktuell) {
+            aktuell = item.section;
+            const k = document.createElement("div");
+            k.className = "kapitel";
+            k.textContent = aktuell;
+            aufgabenEl.appendChild(k);
           }
-          const btn = document.createElement("button");
-          btn.className = "chapter-panel";
-          btn.innerHTML =
-            '<div class="num"></div><div class="name"></div><span class="diff"></span>';
-          btn.querySelector(".num").textContent = "KAPITEL " + (i + 1);
-          btn.querySelector(".name").textContent = item.title;
-          btn.querySelector(".diff").textContent = item.difficulty;
-          btn.addEventListener("click", () => say(speech2, item.description));
-          chaptersEl.appendChild(btn);
+          nummer++;
+          aufgabenEl.appendChild(baueKarte(item, nummer));
         });
+        gesamt = list.length;
+        aktualisiereFortschritt();
       }
 
       fetch("/api/challenges/")
@@ -507,43 +360,18 @@
           return r.json();
         })
         .then(render)
-        .catch(() =>
-          shoot(speech2, "DIE API ANTWORTET NICHT. GIT PUSH UND WEITER."),
-        );
+        .catch(() => {
+          statusEl.textContent = "Die API antwortet nicht. Läuft der Server?";
+        });
 
-      document.getElementById("ask").addEventListener("submit", (e) => {
-        e.preventDefault();
-        const q = e.target.q.value.trim();
-        e.target.q.value = "";
-        if (!q) return;
-        const hit = findAnswer(q);
-        if (hit) {
-          say(speech3, hit.title + ". " + hit.description);
-        } else {
-          shoot(speech3, "DANEBEN! KEIN KURSBEGRIFF. NOCHMAL!");
-        }
-      });
-
-      muteBtn.addEventListener("click", () => {
-        muted = !muted;
-        muteBtn.textContent = muted ? "Ton an" : "Ton aus";
-        if (muted) {
-          if (typeof responsiveVoice !== "undefined") responsiveVoice.cancel();
-          if ("speechSynthesis" in window) speechSynthesis.cancel();
-        }
-      });
-
-      quote.addEventListener("click", () => {
-        sayingIndex = (sayingIndex + 1) % SAYINGS.length;
-        quote.innerHTML = "";
-        quote.textContent = SAYINGS[sayingIndex];
-        speak(SAYINGS[sayingIndex]);
-      });
-
-      hero.addEventListener("click", () => {
-        bubble.firstChild.textContent = "ICH BIN ICH.";
-        speak("Ich bin ich. Und wiederhole mich nicht.");
-      });
+      loadPyodide()
+        .then((p) => {
+          py = p;
+          statusEl.textContent = "Python bereit. Wähl eine Aufgabe.";
+        })
+        .catch(() => {
+          statusEl.textContent = "Python konnte nicht geladen werden.";
+        });
     </script>
   </body>
 </html>
