@@ -80,8 +80,8 @@
       }
       .panel h2 {
         font-family: Impact, sans-serif;
-        font-size: 28px;
-        margin: 22px 0 8px;
+        font-size: 26px;
+        margin: 26px 0 8px;
         text-transform: uppercase;
         border-bottom: 4px solid var(--red);
         display: inline-block;
@@ -99,12 +99,9 @@
         cursor: pointer;
         font-family: inherit;
         box-shadow: 5px 5px 0 #000;
-        transition: transform 0.1s;
       }
       .card:hover {
         background: var(--yellow);
-        transform: translate(-2px, -2px);
-        box-shadow: 7px 7px 0 #000;
       }
       .badge {
         display: inline-block;
@@ -133,7 +130,6 @@
         width: 100%;
         max-width: 260px;
         margin: 8px auto 0;
-        filter: contrast(1.15) saturate(1.1);
         animation: bob 2.4s ease-in-out infinite;
       }
       .figure.shoot {
@@ -170,10 +166,10 @@
         margin: 26px 6px 12px;
         min-height: 64px;
         font-family: Impact, sans-serif;
-        font-size: 20px;
-        letter-spacing: 0.5px;
+        font-size: 18px;
         opacity: 0;
         transition: opacity 0.25s;
+        text-align: left;
       }
       .bubble.show {
         opacity: 1;
@@ -195,7 +191,8 @@
         font-family: inherit;
         background: #fff;
       }
-      #ask button {
+      #ask button,
+      #mute {
         padding: 10px 14px;
         background: var(--red);
         color: #fff;
@@ -206,6 +203,10 @@
         cursor: pointer;
         box-shadow: 4px 4px 0 #000;
       }
+      #mute {
+        margin-top: 12px;
+        background: #333;
+      }
 
       .burst {
         position: fixed;
@@ -215,9 +216,7 @@
         font-family: Impact, sans-serif;
         font-size: 120px;
         color: var(--yellow);
-        text-shadow:
-          6px 6px 0 #000,
-          -2px -2px 0 #000;
+        text-shadow: 6px 6px 0 #000;
         opacity: 0;
         pointer-events: none;
       }
@@ -250,20 +249,21 @@
       </section>
 
       <aside class="panel hero-panel">
-        <span class="caption">Der Sheriff</span>
+        <span class="caption">Ausbilder</span>
         <img
           id="figure"
           class="figure"
           src="{% static 'core/cowboy.png' %}"
-          alt="Der Cowboy"
+          alt="Ausbilder"
         />
 
-        <div class="bubble show" id="bubble">ICH BIN ICH.</div>
+        <div class="bubble show" id="bubble">KLICK EINMAL, DANN REDE ICH.</div>
 
         <form id="ask">
-          <input name="q" placeholder="Frag mich was" autocomplete="off" />
+          <input name="q" placeholder="Frag zum Kurs" autocomplete="off" />
           <button type="submit">Fragen</button>
         </form>
+        <button id="mute" type="button">Ton aus</button>
       </aside>
     </main>
 
@@ -274,18 +274,81 @@
       const bubble = document.getElementById("bubble");
       const figure = document.getElementById("figure");
       const burst = document.getElementById("burst");
+      const muteBtn = document.getElementById("mute");
       const IDLE = [
         "MEIN CODE. MEINE REGELN. KEINE KETTEN.",
         "DRY IST KEINE SÜNDE. ES IST EINE LEBENSEINSTELLUNG.",
         "UND WENN'S MAL HÄNGT… GIT PUSH UND WEITER.",
       ];
+      const STOP = new Set([
+        "der",
+        "die",
+        "das",
+        "und",
+        "ist",
+        "ein",
+        "eine",
+        "wie",
+        "was",
+        "wann",
+        "mit",
+        "für",
+        "von",
+        "den",
+        "dem",
+        "zum",
+        "zur",
+        "bei",
+        "auf",
+        "aus",
+        "man",
+        "ich",
+        "mir",
+        "mich",
+        "dir",
+        "bin",
+        "wird",
+        "werden",
+        "kann",
+      ]);
       let chapters = [];
       let lastTalk = Date.now();
+      let muted = false;
+
+      function speak(text) {
+        if (muted || !("speechSynthesis" in window)) return;
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = "de-DE";
+        u.rate = 0.95;
+        u.pitch = 0.7;
+        const voice = speechSynthesis
+          .getVoices()
+          .find((v) => v.lang.startsWith("de"));
+        if (voice) u.voice = voice;
+        speechSynthesis.speak(u);
+      }
 
       function say(text) {
         bubble.textContent = text;
         bubble.classList.add("show");
         lastTalk = Date.now();
+        speak(text);
+      }
+
+      function gunshot() {
+        if (muted) return;
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const buf = ctx.createBuffer(1, ctx.sampleRate * 0.3, ctx.sampleRate);
+          const d = buf.getChannelData(0);
+          for (let i = 0; i < d.length; i++)
+            d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
+          const src = ctx.createBufferSource();
+          src.buffer = buf;
+          src.connect(ctx.destination);
+          src.start();
+        } catch (e) {}
       }
 
       function shoot(text) {
@@ -293,8 +356,32 @@
         void figure.offsetWidth;
         figure.classList.add("shoot");
         burst.classList.add("on");
+        gunshot();
         say(text);
         setTimeout(() => burst.classList.remove("on"), 400);
+      }
+
+      function words(s) {
+        return s
+          .toLowerCase()
+          .replace(/[^a-zäöüß0-9\s-]/g, " ")
+          .split(/\s+/)
+          .filter((w) => w.length > 2 && !STOP.has(w));
+      }
+
+      function findAnswer(q) {
+        const qw = words(q);
+        let best = null;
+        let score = 0;
+        chapters.forEach((c) => {
+          const cw = new Set(words(c.title + " " + c.description));
+          const s = qw.filter((w) => cw.has(w)).length;
+          if (s > score) {
+            score = s;
+            best = c;
+          }
+        });
+        return best;
       }
 
       function render(list) {
@@ -315,10 +402,11 @@
           const title = document.createElement("strong");
           title.textContent = item.title;
           btn.append(badge, title);
-          btn.addEventListener("click", () => say(item.description));
+          btn.addEventListener("click", () =>
+            say(item.title + ". " + item.description),
+          );
           chaptersEl.appendChild(btn);
         });
-        say("WÄHL EIN KAPITEL. ICH ERKLÄRE ES DIR.");
       }
 
       fetch("/api/challenges/")
@@ -327,27 +415,34 @@
           return r.json();
         })
         .then(render)
-        .catch(() => shoot("DIE API ANTWORTET NICHT. LÄUFT DER SERVER?"));
+        .catch(() => shoot("UND WENN'S MAL HÄNGT… GIT PUSH UND WEITER."));
 
       document.getElementById("ask").addEventListener("submit", (e) => {
         e.preventDefault();
-        const q = e.target.q.value.toLowerCase().trim();
+        const q = e.target.q.value.trim();
         e.target.q.value = "";
         if (!q) return;
-        const hit = chapters.find((c) =>
-          q
-            .split(/\s+/)
-            .some((w) => w.length > 3 && c.title.toLowerCase().includes(w)),
-        );
+        const hit = findAnswer(q);
         if (hit) {
-          say(hit.description);
+          say(hit.title + ". " + hit.description);
         } else {
-          shoot("DANEBEN! NENN EIN WORT AUS EINEM KAPITEL.");
+          shoot("DANEBEN! TIPPFEHLER ODER KEIN KURSBEGRIFF. NOCHMAL!");
         }
       });
 
+      muteBtn.addEventListener("click", () => {
+        muted = !muted;
+        muteBtn.textContent = muted ? "Ton an" : "Ton aus";
+        if (muted && "speechSynthesis" in window) speechSynthesis.cancel();
+      });
+
+      document.addEventListener("click", function greet() {
+        document.removeEventListener("click", greet);
+        say("ICH BIN ICH. FRAG MICH ZUM KURS.");
+      });
+
       setInterval(() => {
-        if (chapters.length && Date.now() - lastTalk > 15000) {
+        if (chapters.length && Date.now() - lastTalk > 20000) {
           say(IDLE[Math.floor(Math.random() * IDLE.length)]);
         }
       }, 4000);
