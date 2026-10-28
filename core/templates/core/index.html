@@ -1,0 +1,290 @@
+{% load static %}
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Django Unchained – Kurs</title>
+    <style>
+      :root {
+        --ink: #120b07;
+        --paper: #f3e9d2;
+        --red: #c8102e;
+        --amber: #d9822b;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--paper);
+        font-family: Arial, sans-serif;
+        background: radial-gradient(circle at 20% 10%, #3a2415, #120b07 70%);
+      }
+      .title {
+        padding: 24px;
+        text-align: center;
+      }
+      .title h1 {
+        font-family: Impact, "Arial Black", sans-serif;
+        font-size: 64px;
+        margin: 0;
+        letter-spacing: 2px;
+      }
+      .title h1 span {
+        color: var(--red);
+      }
+      .title p {
+        font-family: "Courier New", monospace;
+        color: #bfae8a;
+        margin: 8px 0 0;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 20px;
+        padding: 20px;
+        max-width: 1200px;
+        margin: auto;
+      }
+      .panel {
+        background:
+          radial-gradient(#2a1c12 1px, transparent 1px) 0 0 / 6px 6px,
+          #22160e;
+        border: 4px solid #000;
+        box-shadow: 8px 8px 0 #000;
+        padding: 16px;
+      }
+      .panel h2 {
+        font-family: Impact, sans-serif;
+        color: var(--amber);
+        margin: 12px 0 6px;
+        letter-spacing: 1px;
+      }
+
+      .card {
+        display: block;
+        width: 100%;
+        text-align: left;
+        background: var(--paper);
+        color: var(--ink);
+        border: 3px solid #000;
+        margin: 8px 0;
+        padding: 10px;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .card:hover {
+        background: var(--amber);
+      }
+      .badge {
+        font-size: 11px;
+        text-transform: uppercase;
+        font-weight: bold;
+        letter-spacing: 1px;
+      }
+
+      .cowboy-panel {
+        position: sticky;
+        top: 20px;
+        align-self: start;
+        text-align: center;
+      }
+      #cowboy {
+        width: 220px;
+        border: 3px solid #000;
+        box-shadow: 6px 6px 0 #000;
+        animation: bob 2.4s ease-in-out infinite;
+      }
+      #cowboy.shoot {
+        animation: recoil 0.25s;
+      }
+      @keyframes bob {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-6px);
+        }
+      }
+      @keyframes recoil {
+        0% {
+          transform: translateX(0);
+        }
+        30% {
+          transform: translateX(-12px) rotate(-2deg);
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
+
+      .bubble {
+        position: relative;
+        background: #fff;
+        color: #000;
+        border: 3px solid #000;
+        border-radius: 14px;
+        padding: 12px;
+        margin: 14px 0 10px;
+        min-height: 60px;
+        font-weight: bold;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .bubble.show {
+        opacity: 1;
+      }
+
+      #ask input {
+        width: 66%;
+        padding: 8px;
+        border: 3px solid #000;
+        font-family: inherit;
+      }
+      #ask button {
+        padding: 8px 12px;
+        background: var(--red);
+        color: #fff;
+        border: 3px solid #000;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .flash {
+        position: fixed;
+        left: 50%;
+        top: 40%;
+        transform: translate(-50%, -50%);
+        font-family: Impact, sans-serif;
+        font-size: 96px;
+        color: var(--amber);
+        text-shadow: 4px 4px 0 #000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.1s;
+      }
+      .flash.on {
+        opacity: 1;
+      }
+
+      @media (max-width: 800px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .title h1 {
+          font-size: 44px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="title">
+      <h1>DJANGO <span>UNCHAINED</span></h1>
+      <p>Nicht Django. Nur bessere Models. Und mehr Freiheit.</p>
+    </header>
+
+    <main class="grid">
+      <section class="panel" id="chapters">
+        <h2>Kapitel</h2>
+      </section>
+
+      <aside class="panel cowboy-panel">
+        <img id="cowboy" src="{% static 'core/cowboy.png' %}" alt="Cowboy" />
+
+        <div class="bubble show" id="bubble">Ich bin ich.</div>
+
+        <form id="ask">
+          <input name="q" placeholder="Frag mich was" autocomplete="off" />
+          <button type="submit">Fragen</button>
+        </form>
+      </aside>
+    </main>
+
+    <div class="flash" id="flash">PEW!</div>
+
+    <script>
+      const chaptersEl = document.getElementById("chapters");
+      const bubble = document.getElementById("bubble");
+      const cowboy = document.getElementById("cowboy");
+      const flash = document.getElementById("flash");
+      const IDLE = [
+        "Mein Code. Meine Regeln. Keine Ketten.",
+        "DRY ist keine Sünde. Es ist eine Lebenseinstellung.",
+        "Und wenn's mal hängt… git push und weiter.",
+      ];
+      let chapters = [];
+      let lastTalk = Date.now();
+
+      function say(text) {
+        bubble.textContent = text;
+        bubble.classList.add("show");
+        lastTalk = Date.now();
+      }
+
+      function shoot(text) {
+        cowboy.classList.remove("shoot");
+        void cowboy.offsetWidth;
+        cowboy.classList.add("shoot");
+        flash.classList.add("on");
+        say(text);
+        setTimeout(() => flash.classList.remove("on"), 400);
+      }
+
+      function render(list) {
+        chapters = list;
+        let current = "";
+        list.forEach((item) => {
+          if (item.section !== current) {
+            current = item.section;
+            const h = document.createElement("h2");
+            h.textContent = current;
+            chaptersEl.appendChild(h);
+          }
+          const btn = document.createElement("button");
+          btn.className = "card";
+          const badge = document.createElement("span");
+          badge.className = "badge";
+          badge.textContent = item.difficulty;
+          const title = document.createElement("strong");
+          title.textContent = item.title;
+          btn.append(badge, document.createElement("br"), title);
+          btn.addEventListener("click", () => say(item.description));
+          chaptersEl.appendChild(btn);
+        });
+        say("Wähl ein Kapitel. Ich erkläre es dir.");
+      }
+
+      fetch("/api/challenges/")
+        .then((r) => {
+          if (!r.ok) throw new Error(r.status);
+          return r.json();
+        })
+        .then(render)
+        .catch(() => shoot("Die API antwortet nicht. Läuft der Server?"));
+
+      document.getElementById("ask").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const q = e.target.q.value.toLowerCase().trim();
+        e.target.q.value = "";
+        if (!q) return;
+        const hit = chapters.find((c) =>
+          q
+            .split(/\s+/)
+            .some((w) => w.length > 3 && c.title.toLowerCase().includes(w)),
+        );
+        if (hit) {
+          say(hit.description);
+        } else {
+          shoot("Daneben! Nenn ein Wort aus einem Kapitel-Titel.");
+        }
+      });
+
+      setInterval(() => {
+        if (chapters.length && Date.now() - lastTalk > 15000) {
+          say(IDLE[Math.floor(Math.random() * IDLE.length)]);
+        }
+      }, 4000);
+    </script>
+  </body>
+</html>
