@@ -15,13 +15,11 @@ Theme: Django Unchained (Western/Sci-Fi), interaktive Charakterfigur
 4. `settings.py` ersetzt: DRF + CORS + core registriert
 5. Git lokal initialisiert, erster Commit gemacht
 6. GitHub-Repo `CWhymann/django-unchained` (privat) manuell angelegt
-7. Branch auf `main` umbenannt, Push bestätigt
-8. Model `Challenge` (title, description, difficulty, created_at) mit Migration 0001 angelegt
-9. `Challenge` im Admin registriert (list_display, list_filter, search_fields), `manage.py check` ohne Fehler
+7. Branch auf `main` umbenannt, Push-Befehl geliefert (Status offen: bestätigt?)
 
 ## Nächster Schritt
 
-API-Endpunkt für Challenges mit DRF (Serializer, ViewSet, Router in config/urls.py)
+Erstes Model (Dummy-Daten-Grundlage) für core-App
 
 ## Arbeitsregeln (gelten weiter)
 
