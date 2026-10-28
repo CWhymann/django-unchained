@@ -8,10 +8,15 @@ class Challenge(models.Model):
         ('hard', 'Hard'),
     ]
 
+    section = models.CharField(max_length=100, blank=True, default='')
+    order = models.PositiveIntegerField(default=0)
     title = models.CharField(max_length=200)
     description = models.TextField()
     difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='easy')
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['section', 'order']
 
     def __str__(self):
         return self.title

@@ -6,5 +6,5 @@ from .models import Challenge
 class ChallengeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Challenge
-        fields = ['id', 'title', 'description', 'difficulty', 'created_at']
+        fields = ['id', 'section', 'order', 'title', 'description', 'difficulty', 'created_at']
         read_only_fields = ['id', 'created_at']
