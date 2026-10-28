@@ -4,280 +4,374 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Django Unchained – Kurs</title>
+    <title>Django Unchained</title>
     <script src="https://code.responsivevoice.org/responsivevoice.js?key=R3bT9HEV"></script>
     <style>
       :root {
-        --ink: #0d0a08;
-        --paper: #f7ecd0;
-        --red: #d7262e;
-        --yellow: #f5b82e;
-        --blue: #1f6fb4;
+        --ink: #0b0907;
+        --panel: #16110d;
+        --line: #000;
+        --cream: #f2e6cc;
+        --red: #d62c2c;
+        --amber: #e8a13a;
+        --sky: #1b3a5c;
       }
       * {
         box-sizing: border-box;
       }
       body {
         margin: 0;
-        min-height: 100vh;
-        color: var(--ink);
+        background: #0b0907;
+        color: var(--cream);
         font-family: Arial, sans-serif;
-        background-color: #2a1a10;
-        background-image: radial-gradient(#000 22%, transparent 24%);
-        background-size: 8px 8px;
+        min-height: 100vh;
+        padding: 12px;
       }
+      .page {
+        max-width: 1240px;
+        margin: 0 auto;
+        display: grid;
+        gap: 8px;
+      }
+
+      .panel {
+        position: relative;
+        background: var(--panel);
+        border: 6px solid var(--line);
+        padding: 18px;
+        overflow: hidden;
+      }
+      .panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(rgba(0, 0, 0, 0.6) 1px, transparent 1px) 0
+          0 / 5px 5px;
+        opacity: 0.35;
+      }
+      .panel > * {
+        position: relative;
+      }
+
       .hero {
-        background: var(--red);
-        border-bottom: 6px solid #000;
-        padding: 24px;
-        text-align: center;
-        box-shadow: 0 8px 0 #000;
+        min-height: 260px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        background: linear-gradient(120deg, #2b1a10, #0f1c2b 70%);
       }
       .hero h1 {
         font-family: Impact, "Arial Black", sans-serif;
-        font-size: 72px;
+        font-size: 96px;
+        line-height: 0.9;
         margin: 0;
-        color: var(--paper);
-        text-shadow: 5px 5px 0 #000;
-        letter-spacing: 2px;
-        transform: rotate(-2deg);
+        color: var(--cream);
+        letter-spacing: 1px;
+        text-align: right;
       }
-      .hero h1 span {
-        color: var(--yellow);
+      .hero h1 em {
+        display: block;
+        font-style: normal;
+        color: var(--red);
+        font-size: 84px;
       }
-      .hero p {
+      .hero .tag {
         font-family: "Courier New", monospace;
+        color: #c9b893;
+        text-align: right;
+        margin-top: 12px;
+      }
+      .hero .bubble {
+        font-family: "Comic Sans MS", "Segoe Print", cursive;
+        font-size: 30px;
         font-weight: bold;
-        margin: 10px 0 0;
-        color: var(--paper);
+        color: #111;
+        background: #fff;
+        border-radius: 22px;
+        padding: 16px 22px;
+        box-shadow: 6px 6px 0 #000;
+        max-width: 320px;
+        transform: rotate(-3deg);
+      }
+      .hero .bubble small {
+        display: block;
+        font-size: 20px;
+        font-weight: normal;
       }
 
-      .comic {
+      .row {
         display: grid;
-        grid-template-columns: 1fr 360px;
-        gap: 16px;
-        padding: 24px;
-        max-width: 1200px;
-        margin: auto;
+        gap: 8px;
       }
-      .panel {
-        background: var(--paper);
-        border: 6px solid #000;
-        box-shadow: 10px 10px 0 #000;
-        padding: 18px;
-        position: relative;
+      .row-3 {
+        grid-template-columns: 1fr 1fr 1fr;
       }
+      .row-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+
       .caption {
         position: absolute;
         top: 0;
         left: 0;
-        background: var(--yellow);
+        background: var(--amber);
+        color: #000;
+        padding: 4px 10px;
         border-right: 4px solid #000;
         border-bottom: 4px solid #000;
-        padding: 4px 10px;
         font-family: Impact, sans-serif;
-        font-size: 18px;
+        font-size: 16px;
         text-transform: uppercase;
-      }
-      .panel h2 {
-        font-family: Impact, sans-serif;
-        font-size: 26px;
-        margin: 26px 0 8px;
-        text-transform: uppercase;
-        border-bottom: 4px solid var(--red);
-        display: inline-block;
+        z-index: 2;
       }
 
-      .card {
-        display: block;
-        width: 100%;
-        text-align: left;
-        background: #fff;
-        color: var(--ink);
-        border: 4px solid #000;
-        margin: 10px 0;
-        padding: 10px 12px;
-        cursor: pointer;
-        font-family: inherit;
-        box-shadow: 5px 5px 0 #000;
-      }
-      .card:hover {
-        background: var(--yellow);
-      }
-      .badge {
-        display: inline-block;
-        font-size: 11px;
+      .speech {
+        font-family: "Comic Sans MS", "Segoe Print", cursive;
+        font-size: 22px;
         font-weight: bold;
+        color: #111;
+        background: #fff;
+        border: 4px solid #000;
+        border-radius: 18px;
+        padding: 12px 16px;
+        margin: 36px 0 0;
+        line-height: 1.2;
+      }
+      .speech.dark {
+        background: #fff;
+        color: #111;
+      }
+
+      .chapters {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 12px;
+        margin-top: 30px;
+      }
+      .chapter-panel {
+        text-align: left;
+        background: #0f0b08;
+        color: var(--cream);
+        border: 4px solid #000;
+        padding: 14px;
+        cursor: pointer;
+        box-shadow: 6px 6px 0 #000;
+        font-family: inherit;
+        min-height: 120px;
+      }
+      .chapter-panel:hover {
+        background: #2a1d14;
+        transform: translate(-2px, -2px);
+        box-shadow: 8px 8px 0 var(--red);
+      }
+      .chapter-panel .num {
+        font-family: Impact, sans-serif;
+        color: var(--red);
+        font-size: 18px;
+      }
+      .chapter-panel .name {
+        font-family: Impact, sans-serif;
+        font-size: 20px;
         text-transform: uppercase;
-        background: var(--blue);
-        color: #fff;
+        margin-top: 4px;
+      }
+      .chapter-panel .diff {
+        display: inline-block;
+        margin-top: 8px;
+        font-size: 11px;
+        text-transform: uppercase;
+        background: var(--sky);
         padding: 2px 6px;
         border: 2px solid #000;
       }
-      .card strong {
-        display: block;
-        margin-top: 6px;
+      .section-title {
+        font-family: Impact, sans-serif;
+        font-size: 26px;
+        text-transform: uppercase;
+        margin: 22px 0 0;
+        color: var(--amber);
+      }
+
+      .ask-form {
+        display: flex;
+        gap: 8px;
+        margin-top: 30px;
+      }
+      .ask-form input {
+        flex: 1;
+        padding: 12px;
+        border: 4px solid #000;
+        background: #fff;
+        font-family: inherit;
         font-size: 16px;
       }
-
-      .hero-panel {
-        position: sticky;
-        top: 20px;
-        align-self: start;
-        text-align: center;
-      }
-      .figure {
-        display: block;
-        width: 100%;
-        max-width: 260px;
-        margin: 8px auto 0;
-        animation: bob 2.4s ease-in-out infinite;
-      }
-      .figure.shoot {
-        animation: recoil 0.25s;
-      }
-      @keyframes bob {
-        0%,
-        100% {
-          transform: translateY(0);
-        }
-        50% {
-          transform: translateY(-6px);
-        }
-      }
-      @keyframes recoil {
-        0% {
-          transform: translateX(0);
-        }
-        30% {
-          transform: translateX(-14px) rotate(-3deg);
-        }
-        100% {
-          transform: translateX(0);
-        }
-      }
-
-      .bubble {
-        position: relative;
-        background: #fff;
-        color: var(--ink);
-        border: 4px solid #000;
-        border-radius: 18px;
-        padding: 14px;
-        margin: 26px 6px 12px;
-        min-height: 64px;
-        font-family: Impact, sans-serif;
-        font-size: 18px;
-        opacity: 0;
-        transition: opacity 0.25s;
-        text-align: left;
-      }
-      .bubble.show {
-        opacity: 1;
-      }
-      .bubble::after {
-        content: "";
-        position: absolute;
-        top: -22px;
-        left: 40px;
-        border: 12px solid transparent;
-        border-bottom: 16px solid #000;
-        border-top: 0;
-      }
-
-      #ask input {
-        width: 66%;
-        padding: 10px;
-        border: 4px solid #000;
-        font-family: inherit;
-        background: #fff;
-      }
-      #ask button,
-      #mute {
-        padding: 10px 14px;
+      .ask-form button {
+        padding: 12px 18px;
         background: var(--red);
         color: #fff;
         border: 4px solid #000;
         font-family: Impact, sans-serif;
-        font-size: 16px;
+        font-size: 18px;
         text-transform: uppercase;
         cursor: pointer;
         box-shadow: 4px 4px 0 #000;
       }
-      #mute {
-        margin-top: 12px;
+      .mute {
+        margin-top: 10px;
         background: #333;
+        color: #fff;
+        border: 4px solid #000;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-family: Impact, sans-serif;
+        text-transform: uppercase;
+      }
+
+      .quote {
+        font-family: "Comic Sans MS", "Segoe Print", cursive;
+        font-size: 30px;
+        font-weight: bold;
+        color: var(--cream);
+        text-align: center;
+        margin: 0;
+        padding-top: 40px;
+        line-height: 1.2;
+      }
+      .quote small {
+        display: block;
+        font-size: 22px;
+        margin-top: 8px;
+        color: var(--amber);
       }
 
       .burst {
         position: fixed;
         left: 50%;
-        top: 42%;
+        top: 40%;
         transform: translate(-50%, -50%) scale(0.6);
         font-family: Impact, sans-serif;
-        font-size: 120px;
-        color: var(--yellow);
+        font-size: 140px;
+        color: var(--amber);
         text-shadow: 6px 6px 0 #000;
         opacity: 0;
         pointer-events: none;
+        z-index: 10;
       }
       .burst.on {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
-        transition: all 0.15s;
+        transition: all 0.12s;
+      }
+      .shake {
+        animation: shake 0.35s;
+      }
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-8px);
+        }
+        75% {
+          transform: translateX(8px);
+        }
       }
 
-      @media (max-width: 860px) {
-        .comic {
+      @media (max-width: 900px) {
+        .hero {
           grid-template-columns: 1fr;
         }
         .hero h1 {
-          font-size: 46px;
+          font-size: 64px;
+          text-align: left;
+        }
+        .hero h1 em {
+          font-size: 56px;
+        }
+        .hero .tag {
+          text-align: left;
+        }
+        .row-3,
+        .row-2 {
+          grid-template-columns: 1fr;
         }
       }
     </style>
   </head>
   <body>
-    <header class="hero">
-      <h1>DJANGO <span>UNCHAINED</span></h1>
-      <p>NICHT DJANGO. NUR BESSERE MODELS. UND MEHR FREIHEIT.</p>
-    </header>
+    <div class="page">
+      <header class="panel hero" id="hero">
+        <span class="caption">Titel</span>
+        <div>
+          <div class="bubble" id="bubble">
+            ICH BIN ICH.<small>UND WIEDERHOLE MICH NICHT.</small>
+          </div>
+        </div>
+        <div>
+          <h1>DJANGO<em>UNCHAINED</em></h1>
+          <p class="tag">
+            Nicht Django.<br />Nur bessere Models.<br />Und mehr Freiheit.
+          </p>
+        </div>
+      </header>
 
-    <main class="comic">
-      <section class="panel" id="chapters">
-        <span class="caption">Kapitel</span>
-        <h2>Das Programm</h2>
+      <div class="row row-3">
+        <section class="panel" id="panel-1">
+          <span class="caption">Kapitel</span>
+          <div class="speech" id="speech-1">
+            Klick ein Kapitel an. Ich erkläre es dir.
+          </div>
+        </section>
+        <section class="panel" id="panel-2">
+          <span class="caption">Erklärung</span>
+          <div class="speech" id="speech-2">
+            Hier steht, was das Kapitel sagt.
+          </div>
+        </section>
+        <section class="panel" id="panel-3">
+          <span class="caption">Frage</span>
+          <div class="speech" id="speech-3">Stell mir eine Frage zum Kurs.</div>
+        </section>
+      </div>
+
+      <section class="panel">
+        <span class="caption">Kurs</span>
+        <div class="section-title" id="sections"></div>
+        <div class="chapters" id="chapters"></div>
       </section>
 
-      <aside class="panel hero-panel">
-        <span class="caption">Ausbilder</span>
-        <img
-          id="figure"
-          class="figure"
-          src="{% static 'core/cowboy.png' %}"
-          alt="Ausbilder"
-        />
-
-        <div class="bubble show" id="bubble">
-          ICH BIN ICH. UND WIEDERHOLE MICH NICHT.
-        </div>
-
-        <form id="ask">
+      <section class="panel">
+        <span class="caption">Dein Wort</span>
+        <form class="ask-form" id="ask">
           <input name="q" placeholder="Frag zum Kurs" autocomplete="off" />
           <button type="submit">Fragen</button>
         </form>
-        <button id="mute" type="button">Ton aus</button>
-      </aside>
-    </main>
+        <button class="mute" id="mute" type="button">Ton aus</button>
+      </section>
+
+      <section class="panel">
+        <span class="caption">Lebenseinstellung</span>
+        <p class="quote" id="quote">
+          DRY IST KEINE SÜNDE.<small>ES IST EINE LEBENSEINSTELLUNG.</small>
+        </p>
+      </section>
+    </div>
 
     <div class="burst" id="burst">PEW!</div>
 
     <script>
-      const chaptersEl = document.getElementById("chapters");
       const bubble = document.getElementById("bubble");
-      const figure = document.getElementById("figure");
+      const chaptersEl = document.getElementById("chapters");
+      const sectionsEl = document.getElementById("sections");
+      const speech1 = document.getElementById("speech-1");
+      const speech2 = document.getElementById("speech-2");
+      const speech3 = document.getElementById("speech-3");
       const burst = document.getElementById("burst");
       const muteBtn = document.getElementById("mute");
+      const quote = document.getElementById("quote");
+      const hero = document.getElementById("hero");
       const STOP = new Set([
         "der",
         "die",
@@ -309,8 +403,17 @@
         "werden",
         "kann",
       ]);
+      const SAYINGS = [
+        "MEIN CODE. MEINE REGELN. KEINE KETTEN.",
+        "SCHEMATISCH IST SCHÖN. ABER ECHTE FREIHEIT LIEGT IN SAUBEREM CODE.",
+        "DRY IST KEINE SÜNDE. ES IST EINE LEBENSEINSTELLUNG.",
+        "KEIN CHAOS. NUR KONTROLLE.",
+        "FLEXIBEL. SKALIERBAR. DJANGO.",
+        "UND WENN'S MAL HÄNGT… GIT PUSH UND WEITER.",
+      ];
       let chapters = [];
       let muted = false;
+      let sayingIndex = 0;
 
       function speak(text) {
         if (muted) return;
@@ -320,12 +423,6 @@
           speechSynthesis.cancel();
           speechSynthesis.speak(new SpeechSynthesisUtterance(text));
         }
-      }
-
-      function say(text) {
-        bubble.textContent = text;
-        bubble.classList.add("show");
-        speak(text);
       }
 
       function gunshot() {
@@ -343,14 +440,19 @@
         } catch (e) {}
       }
 
-      function shoot(text) {
-        figure.classList.remove("shoot");
-        void figure.offsetWidth;
-        figure.classList.add("shoot");
+      function say(el, text) {
+        el.textContent = text;
+        speak(text);
+      }
+
+      function shoot(el, text) {
+        el.classList.remove("shake");
+        void el.offsetWidth;
+        el.classList.add("shake");
         burst.classList.add("on");
         gunshot();
-        say(text);
-        setTimeout(() => burst.classList.remove("on"), 400);
+        say(el, text);
+        setTimeout(() => burst.classList.remove("on"), 300);
       }
 
       function words(s) {
@@ -379,24 +481,22 @@
       function render(list) {
         chapters = list;
         let current = "";
-        list.forEach((item) => {
+        list.forEach((item, i) => {
           if (item.section !== current) {
             current = item.section;
-            const h = document.createElement("h2");
+            const h = document.createElement("div");
+            h.className = "section-title";
             h.textContent = current;
-            chaptersEl.appendChild(h);
+            chaptersEl.parentElement.insertBefore(h, chaptersEl);
           }
           const btn = document.createElement("button");
-          btn.className = "card";
-          const badge = document.createElement("span");
-          badge.className = "badge";
-          badge.textContent = item.difficulty;
-          const title = document.createElement("strong");
-          title.textContent = item.title;
-          btn.append(badge, title);
-          btn.addEventListener("click", () =>
-            say(item.title + ". " + item.description),
-          );
+          btn.className = "chapter-panel";
+          btn.innerHTML =
+            '<div class="num"></div><div class="name"></div><span class="diff"></span>';
+          btn.querySelector(".num").textContent = "KAPITEL " + (i + 1);
+          btn.querySelector(".name").textContent = item.title;
+          btn.querySelector(".diff").textContent = item.difficulty;
+          btn.addEventListener("click", () => say(speech2, item.description));
           chaptersEl.appendChild(btn);
         });
       }
@@ -407,7 +507,9 @@
           return r.json();
         })
         .then(render)
-        .catch(() => shoot("DIE API ANTWORTET NICHT."));
+        .catch(() =>
+          shoot(speech2, "DIE API ANTWORTET NICHT. GIT PUSH UND WEITER."),
+        );
 
       document.getElementById("ask").addEventListener("submit", (e) => {
         e.preventDefault();
@@ -416,9 +518,9 @@
         if (!q) return;
         const hit = findAnswer(q);
         if (hit) {
-          say(hit.title + ". " + hit.description);
+          say(speech3, hit.title + ". " + hit.description);
         } else {
-          shoot("DANEBEN! KEIN KURSBEGRIFF. NOCHMAL!");
+          shoot(speech3, "DANEBEN! KEIN KURSBEGRIFF. NOCHMAL!");
         }
       });
 
@@ -429,6 +531,18 @@
           if (typeof responsiveVoice !== "undefined") responsiveVoice.cancel();
           if ("speechSynthesis" in window) speechSynthesis.cancel();
         }
+      });
+
+      quote.addEventListener("click", () => {
+        sayingIndex = (sayingIndex + 1) % SAYINGS.length;
+        quote.innerHTML = "";
+        quote.textContent = SAYINGS[sayingIndex];
+        speak(SAYINGS[sayingIndex]);
+      });
+
+      hero.addEventListener("click", () => {
+        bubble.firstChild.textContent = "ICH BIN ICH.";
+        speak("Ich bin ich. Und wiederhole mich nicht.");
       });
     </script>
   </body>
