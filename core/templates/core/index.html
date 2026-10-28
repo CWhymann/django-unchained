@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Django Unchained – Kurs</title>
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=R3bT9HEV"></script>
     <style>
       :root {
         --ink: #0d0a08;
@@ -311,27 +312,14 @@
       let chapters = [];
       let muted = false;
 
-      function maleGermanVoice() {
-        const voices = speechSynthesis
-          .getVoices()
-          .filter((v) => v.lang.startsWith("de"));
-        return (
-          voices.find((v) => /stefan|male|mann|hans|conrad/i.test(v.name)) ||
-          voices[0] ||
-          null
-        );
-      }
-
       function speak(text) {
-        if (muted || !("speechSynthesis" in window)) return;
-        speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = "de-DE";
-        u.rate = 1;
-        u.pitch = 0.8;
-        const voice = maleGermanVoice();
-        if (voice) u.voice = voice;
-        speechSynthesis.speak(u);
+        if (muted) return;
+        if (typeof responsiveVoice !== "undefined") {
+          responsiveVoice.speak(text, "Deutsch Male", { rate: 1, pitch: 0.8 });
+        } else if ("speechSynthesis" in window) {
+          speechSynthesis.cancel();
+          speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+        }
       }
 
       function say(text) {
@@ -437,7 +425,10 @@
       muteBtn.addEventListener("click", () => {
         muted = !muted;
         muteBtn.textContent = muted ? "Ton an" : "Ton aus";
-        if (muted && "speechSynthesis" in window) speechSynthesis.cancel();
+        if (muted) {
+          if (typeof responsiveVoice !== "undefined") responsiveVoice.cancel();
+          if ("speechSynthesis" in window) speechSynthesis.cancel();
+        }
       });
     </script>
   </body>
