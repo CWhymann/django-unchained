@@ -257,7 +257,9 @@
           alt="Ausbilder"
         />
 
-        <div class="bubble show" id="bubble">KLICK EINMAL, DANN REDE ICH.</div>
+        <div class="bubble show" id="bubble">
+          ICH BIN ICH. UND WIEDERHOLE MICH NICHT.
+        </div>
 
         <form id="ask">
           <input name="q" placeholder="Frag zum Kurs" autocomplete="off" />
@@ -275,11 +277,6 @@
       const figure = document.getElementById("figure");
       const burst = document.getElementById("burst");
       const muteBtn = document.getElementById("mute");
-      const IDLE = [
-        "MEIN CODE. MEINE REGELN. KEINE KETTEN.",
-        "DRY IST KEINE SÜNDE. ES IST EINE LEBENSEINSTELLUNG.",
-        "UND WENN'S MAL HÄNGT… GIT PUSH UND WEITER.",
-      ];
       const STOP = new Set([
         "der",
         "die",
@@ -312,19 +309,27 @@
         "kann",
       ]);
       let chapters = [];
-      let lastTalk = Date.now();
       let muted = false;
+
+      function maleGermanVoice() {
+        const voices = speechSynthesis
+          .getVoices()
+          .filter((v) => v.lang.startsWith("de"));
+        return (
+          voices.find((v) => /stefan|male|mann|hans|conrad/i.test(v.name)) ||
+          voices[0] ||
+          null
+        );
+      }
 
       function speak(text) {
         if (muted || !("speechSynthesis" in window)) return;
         speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(text);
         u.lang = "de-DE";
-        u.rate = 0.95;
-        u.pitch = 0.7;
-        const voice = speechSynthesis
-          .getVoices()
-          .find((v) => v.lang.startsWith("de"));
+        u.rate = 1;
+        u.pitch = 0.8;
+        const voice = maleGermanVoice();
         if (voice) u.voice = voice;
         speechSynthesis.speak(u);
       }
@@ -332,7 +337,6 @@
       function say(text) {
         bubble.textContent = text;
         bubble.classList.add("show");
-        lastTalk = Date.now();
         speak(text);
       }
 
@@ -415,7 +419,7 @@
           return r.json();
         })
         .then(render)
-        .catch(() => shoot("UND WENN'S MAL HÄNGT… GIT PUSH UND WEITER."));
+        .catch(() => shoot("DIE API ANTWORTET NICHT."));
 
       document.getElementById("ask").addEventListener("submit", (e) => {
         e.preventDefault();
@@ -426,7 +430,7 @@
         if (hit) {
           say(hit.title + ". " + hit.description);
         } else {
-          shoot("DANEBEN! TIPPFEHLER ODER KEIN KURSBEGRIFF. NOCHMAL!");
+          shoot("DANEBEN! KEIN KURSBEGRIFF. NOCHMAL!");
         }
       });
 
@@ -435,17 +439,6 @@
         muteBtn.textContent = muted ? "Ton an" : "Ton aus";
         if (muted && "speechSynthesis" in window) speechSynthesis.cancel();
       });
-
-      document.addEventListener("click", function greet() {
-        document.removeEventListener("click", greet);
-        say("ICH BIN ICH. FRAG MICH ZUM KURS.");
-      });
-
-      setInterval(() => {
-        if (chapters.length && Date.now() - lastTalk > 20000) {
-          say(IDLE[Math.floor(Math.random() * IDLE.length)]);
-        }
-      }, 4000);
     </script>
   </body>
 </html>
