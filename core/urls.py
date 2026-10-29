@@ -4,7 +4,14 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+
+    # Übungsseite: Aufgaben holen und Antworten prüfen
+    path('api/missions/', views.missions_api, name='missions-api'),
+    path('api/check/', views.check_api, name='check-api'),
+
+    # Demo-Endpunkte für die Live-Übungen
     path('demo/posts/', views.PostsListView.as_view(), name='posts'),
+    path('demo/posts/strict/', views.strict_post, name='posts-strict'),
     path('demo/posts/latest/', views.latest_post, name='latest-post'),
     path('demo/posts/<int:post_id>/', views.post_detail, name='post-detail'),
     path('demo/posts/<slug:post_slug>/', views.post_by_slug, name='post-by-slug'),
