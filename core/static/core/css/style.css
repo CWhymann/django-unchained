@@ -552,7 +552,7 @@ footer {
 .cowboy {
   position: fixed;
   right: 16px;
-  bottom: 0;
+  bottom: 32px;
   z-index: 20;
   width: 240px;
   display: flex;
@@ -571,8 +571,7 @@ footer {
   height: auto;
   cursor: pointer;
   border: 4px solid var(--cream);
-  border-bottom: 0;
-  border-radius: 22px 22px 0 0;
+  border-radius: 22px;
   box-shadow: 0 0 24px rgba(255, 138, 61, 0.5);
   transform-origin: 50% 100%;
   animation: breathe 3.4s ease-in-out infinite;
