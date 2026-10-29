@@ -2,28 +2,29 @@
 
 ## Ziel
 
-Interaktive Browser-Übungsseite für den kompletten BACKEND-05-Kurs (Django),
-Fokus auf aktuelle Django/DRF-Praxis statt veralteter Kurs-Syntax.
-Theme: Django Unchained (Western/Sci-Fi), interaktive Charakterfigur
-(Cowboy aus Referenzbild) gibt wie ein Windows-Assistent Aufgaben/Korrekturen.
+Interaktive Browser-Übungsseite für den BACKEND-05-Kurs (Django Grundlagen).
+Theme: Django Unchained (Western/Sci-Fi). Der Cowboy aus dem Comic erscheint
+animiert wie ein Windows-Assistent, stellt Fragen, gibt Tipps und korrigiert.
 
-## Bisher erledigt
+## Aufbau
 
-1. Projektordner `django-unchained` in DA_BD_Django angelegt
-2. venv erstellt, django, djangorestframework, django-cors-headers installiert
-3. Django-Projekt `config` + App `core` erstellt
-4. `settings.py` ersetzt: DRF + CORS + core registriert
-5. Git lokal initialisiert, erster Commit gemacht
-6. GitHub-Repo `CWhymann/django-unchained` (privat) manuell angelegt
-7. Branch auf `main` umbenannt, Push-Befehl geliefert (Status offen: bestätigt?)
+- `core/content.py`: 6 Missionen, 30 Übungen (Quiz, Lückencode, Bug-Jagd, Reihenfolge, Live-Request). Lösungen bleiben auf dem Server.
+- `core/views.py`: `/api/missions/` (Aufgaben), `/api/check/` (Antwort prüfen, CSRF-geschützt), Demo-Endpunkte unter `/demo/` für die Live-Übungen.
+- `core/templates/core/index.html`, `core/static/core/{css,js,img}`: Oberfläche, Logik und Cowboy-Animation.
+- Fortschritt liegt im Browser (localStorage), keine Datenbank-Models.
+- Django liefert die Seite selbst unter `/` aus (ein Server, kein Live Server nötig).
+
+## Stand
+
+Alle 6 Missionen sind umgesetzt und getestet. Der alte Challenge-Stand ist entfernt.
 
 ## Nächster Schritt
 
-Erstes Model (Dummy-Daten-Grundlage) für core-App
+Optik im Browser prüfen und Feinschliff (Texte, Animationen, weitere Übungen).
 
 ## Arbeitsregeln (gelten weiter)
 
 - Schritt für Schritt, kein Vorauseilen
-- Vollständige Dateien, PowerShell-Befehle bei neuen Dateien
+- Vollständige Dateien, PowerShell-Befehl zuerst bei neuen Dateien
 - Commit-Befehl mit englischer Message nach jedem Schritt
-- Tokens sparen, keine ungefragten Features
+- Keine ungefragten Features
