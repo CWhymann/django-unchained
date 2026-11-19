@@ -389,6 +389,90 @@ MISSIONS = [
                  'Er fängt mit Default an.'),
         ],
     },
+
+
+    {
+        'id': 'm9',
+        'title': 'Der Sheriff kennt dein Gesicht',
+        'section': 'Backend 08 – Authentication & Authorization',
+        'intro': 'Halt, Fremder! Bevor du den Saloon betrittst, musst du beweisen, wer du bist. Und selbst dann entscheidet der Sheriff, was du darfst.',
+        'outro': 'Deine Identität ist bestätigt. Du kennst den Unterschied zwischen Anmeldung und Berechtigung. Der Sheriff nickt anerkennend.',
+        'exercises': [
+            quiz('m9-1', 'Wer bist du, Fremder?',
+                 'Was ist der Unterschied zwischen Authentication und Authorization?',
+                 [
+                     'Authentication prüft die Identität, Authorization die Berechtigungen.',
+                     'Authentication prüft Berechtigungen, Authorization die Identität.',
+                     'Beide Begriffe beschreiben ausschließlich das Login.',
+                     'Authentication ist nur für Administratoren gedacht.'
+                 ],
+                 0,
+                 'Authentication beantwortet die Frage: Wer bist du? Authorization beantwortet: Was darfst du? Erst wird die Identität festgestellt, anschließend werden Berechtigungen geprüft.',
+                 'Ein Begriff prüft deine Identität, der andere deine Rechte.'),
+
+            quiz('m9-2', 'Das geheime Passwort',
+                 'Wie speichert Django das Passwort eines Users in der Datenbank?',
+                 [
+                     'Als normalen Klartext im username-Feld.',
+                     'Verschlüsselt im email-Feld.',
+                     'Als Hash mit zusätzlichen Sicherheitsinformationen im password-Feld.',
+                     'Gar nicht. Das Passwort bleibt ausschließlich im Browser.'
+                 ],
+                 2,
+                 'Django speichert kein Klartextpasswort. Im Feld password liegt ein kodierter Passwort-Hash mit Informationen zum verwendeten Verfahren und Salt. Django kann damit Passwörter sicher überprüfen.',
+                 'Suche nach einer Einwegfunktion statt nach einer normalen Verschlüsselung.'),
+
+            quiz('m9-3', 'Der Türsteher',
+                 'Was macht die Django-Funktion authenticate() bei einer Anmeldung?',
+                 [
+                     'Sie erstellt automatisch einen neuen Benutzer.',
+                     'Sie überprüft die Zugangsdaten und liefert einen passenden User oder None zurück.',
+                     'Sie vergibt automatisch Administratorrechte.',
+                     'Sie erstellt einen Token für jeden Benutzer.'
+                 ],
+                 1,
+                 'authenticate() prüft die übergebenen Zugangsdaten über die konfigurierten Authentication Backends. Bei erfolgreicher Prüfung wird ein User-Objekt zurückgegeben, andernfalls None.',
+                 'Die Funktion kontrolliert Zugangsdaten, erstellt aber nicht automatisch einen Account.'),
+
+            quiz('m9-4', 'Der offene Saloon',
+                 'Warum bekommt eine Login-APIView häufig permission_classes = [AllowAny]?',
+                 [
+                     'Damit nur Administratoren sich anmelden können.',
+                     'Damit alle Benutzer automatisch Superuser werden.',
+                     'Damit Django die Passwortprüfung überspringt.',
+                     'Damit auch noch nicht angemeldete Benutzer den Login-Endpunkt aufrufen dürfen.'
+                 ],
+                 3,
+                 'Ein Login muss auch für nicht angemeldete Besucher erreichbar sein. AllowAny erlaubt den Zugriff unabhängig vom bisherigen Anmeldestatus. Die Zugangsdaten werden trotzdem geprüft.',
+                 'Ein Benutzer kann sich schlecht anmelden, wenn er dafür bereits angemeldet sein müsste.'),
+
+            fill('m9-5', 'Die Anmeldung am Sheriff-Schalter',
+                 'Vervollständige die Login-APIView. Ungültige Zugangsdaten müssen mit HTTP 401 beantwortet werden.',
+                 'from django.contrib.auth import authenticate\nfrom rest_framework.views import APIView\nfrom rest_framework.response import Response\nfrom rest_framework import status\n\nclass LoginView([[1]]):\n    def post(self, request):\n        user = [[2]](\n            request,\n            username=request.data.get("username"),\n            password=request.data.get("password")\n        )\n        if user is None:\n            return Response(\n                {"detail": "Ungültige Zugangsdaten"},\n                status=status.[[3]]\n            )\n        return Response({"detail": "Anmeldung erfolgreich"})',
+                 [
+                     ['APIView'],
+                     ['authenticate'],
+                     ['HTTP_401_UNAUTHORIZED', 'HTTP_401']
+                 ],
+                 'Eine APIView verarbeitet den Request. authenticate() prüft Benutzername und Passwort. Gibt die Funktion None zurück, antwortet die API mit HTTP 401 Unauthorized.',
+                 'Achte auf die Basisklasse, die Funktion zur Prüfung und den HTTP-Status für fehlende gültige Zugangsdaten.'),
+
+            bug('m9-6', 'Der falsche Passwortvergleich',
+                'Der Sheriff vergleicht das eingegebene Passwort direkt mit dem Datenbankwert. Welche Zeile ist fehlerhaft?',
+                [
+                    'def verify_password(user, raw_password):',
+                    '    if user is None:',
+                    '        return False',
+                    '    if user.password == raw_password:',
+                    '        return True',
+                    '    return False'
+                ],
+                [4],
+                'Das Passwortfeld enthält einen kodierten Hash und nicht das ursprüngliche Passwort. Ein direkter Vergleich kann deshalb nicht funktionieren. Django bietet user.check_password(raw_password) für die sichere Überprüfung an.',
+                'Im User-Objekt liegt nicht das ursprüngliche Passwort im Klartext.')
+        ],
+    },
+
 ]
 
 EXERCISES = {ex['id']: ex for m in MISSIONS for ex in m['exercises']}
