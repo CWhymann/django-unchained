@@ -473,6 +473,102 @@ MISSIONS = [
         ],
     },
 
+
+    {
+        'id': 'm10',
+        'title': 'Zutritt nur mit Erlaubnis',
+        'section': 'Backend 08 – Permissions',
+        'intro': 'Der Sheriff hat neue Regeln aufgestellt. Nicht jeder darf den Saloon betreten. Manche dürfen nur zuschauen, andere müssen ihre Identität nachweisen. Und wer an fremdes Eigentum will, braucht eine besondere Erlaubnis.',
+        'outro': 'Du kennst jetzt die Regeln des Saloon. Du kannst Zugriffe auf ganze Views und einzelne Objekte kontrollieren. Der Sheriff übergibt dir seinen Schlüssel.',
+        'exercises': [
+            quiz('m10-1', 'Das Gesetz des Sheriffs',
+                 'Was bewirkt DEFAULT_PERMISSION_CLASSES in der REST_FRAMEWORK-Konfiguration?',
+                 [
+                     'Es legt die Standard-Berechtigungen für API-Views fest, sofern eine View keine eigenen Permissions definiert.',
+                     'Es legt fest, welche Benutzer sich registrieren dürfen.',
+                     'Es bestimmt, welche Serializer verwendet werden.',
+                     'Es aktiviert automatisch die Token-Authentifizierung.'
+                 ],
+                 0,
+                 'DEFAULT_PERMISSION_CLASSES definiert die globalen Standardberechtigungen für DRF. Eine View kann diese mit eigenen permission_classes überschreiben.',
+                 'Es geht um die Voreinstellung für den Zugriff auf API-Endpunkte.'),
+
+            quiz('m10-2', 'Nur mit Ausweis',
+                 'Was erlaubt die Permission-Klasse IsAuthenticatedOrReadOnly?',
+                 [
+                     'Alle Benutzer dürfen sämtliche HTTP-Methoden verwenden.',
+                     'Nicht angemeldete Benutzer dürfen nur sichere Methoden wie GET, HEAD und OPTIONS verwenden. Schreibzugriffe erfordern eine Anmeldung.',
+                     'Nur Administratoren dürfen GET-Requests ausführen.',
+                     'Angemeldete Benutzer dürfen ausschließlich GET verwenden.'
+                 ],
+                 1,
+                 'IsAuthenticatedOrReadOnly erlaubt anonymen Benutzern lesende Zugriffe über sichere Methoden. Für POST, PUT, PATCH und DELETE muss der Benutzer angemeldet sein.',
+                 'Unterscheide zwischen Lesen und Verändern von Daten.'),
+
+            quiz('m10-3', 'Der Sheriff entscheidet',
+                 'Welche Voraussetzung prüft die DRF-Permission IsAdminUser standardmäßig?',
+                 [
+                     'Der Benutzer muss eine gültige E-Mail-Adresse besitzen.',
+                     'Der Benutzer muss mindestens einen Token besitzen.',
+                     'Der Benutzer muss die Eigenschaft is_staff = True haben.',
+                     'Der Benutzer muss ein Superuser sein.'
+                 ],
+                 2,
+                 'IsAdminUser prüft request.user.is_staff. Ein Benutzer muss also als Mitarbeiter gekennzeichnet sein. Die Permission verlangt nicht ausdrücklich is_superuser = True.',
+                 'Schau auf die Kennzeichnung, die Django für den Zugang zum Admin-Bereich verwendet.'),
+
+            fill('m10-4', 'Die Hausordnung',
+                 'Konfiguriere globale Berechtigungen so, dass nur angemeldete Benutzer standardmäßig auf die API zugreifen dürfen.',
+                 "REST_FRAMEWORK = {\n    'DEFAULT_PERMISSION_CLASSES': [\n        'rest_framework.permissions.[[1]]',\n    ],\n}",
+                 [['IsAuthenticated']],
+                 'Mit IsAuthenticated werden nicht angemeldete Benutzer standardmäßig abgewiesen. Für einzelne öffentliche Endpunkte kann eine View weiterhin AllowAny verwenden.',
+                 'Die Permission beginnt mit Is und verlangt einen angemeldeten Benutzer.'),
+
+            fill('m10-5', 'Der persönliche Türsteher',
+                 'Schreibe eine eigene has_permission-Prüfung, die nur angemeldeten Benutzern Zugriff gewährt.',
+                 "from rest_framework.permissions import BasePermission\n\nclass IsLoggedIn(BasePermission):\n    def has_permission(self, request, view):\n        return request.user.[[1]]",
+                 [['is_authenticated']],
+                 'has_permission() prüft den Zugriff auf die gesamte View. request.user.is_authenticated liefert True für angemeldete Benutzer und False für anonyme Benutzer.',
+                 'Django stellt am User-Objekt eine Eigenschaft bereit, die den Anmeldestatus angibt.'),
+
+            order('m10-6', 'Die Prüfung am Tresor',
+                  'Bringe die Schritte einer Objektprüfung in einer DRF-Detail-View in die richtige Reihenfolge.',
+                  [
+                      {'id': 'c', 'text': 'has_object_permission(request, view, obj) prüft den Zugriff auf das Objekt.'},
+                      {'id': 'a', 'text': 'has_permission(request, view) prüft den grundsätzlichen Zugriff auf die View.'},
+                      {'id': 'd', 'text': 'Bei erlaubtem Zugriff verarbeitet die View das Objekt und erstellt die Response.'},
+                      {'id': 'b', 'text': 'get_object() ermittelt das angeforderte Datenbankobjekt.'}
+                  ],
+                  [['a', 'b', 'c', 'd']],
+                  'Zuerst wird die View-Berechtigung geprüft. Danach wird das Objekt ermittelt. Bei generischen DRF-Views führt get_object() anschließend die Objektprüfung über check_object_permissions() aus. Erst danach kann die View regulär mit dem Objekt arbeiten. Achtung: Bei Listen-Endpunkten werden Objektberechtigungen nicht automatisch für jedes einzelne Ergebnis geprüft.',
+                  'Erst die Tür kontrollieren, dann den Tresor finden und anschließend dessen Schloss prüfen.'),
+
+            bug('m10-7', 'Der fehlerhafte Türsteher',
+                'Die eigene Objektberechtigung IsOwner soll prüfen, ob ein Benutzer Eigentümer eines Objekts ist. Klicke die fehlerhafte Zeile.',
+                [
+                    'class IsOwner(BasePermission):',
+                    '    def has_object_permission(self, request, view):',
+                    '        return obj.owner == request.user',
+                    '',
+                    '# Die Permission wird auf ein einzelnes Objekt angewendet.'
+                ],
+                [2],
+                'Die Methodensignatur ist unvollständig. DRF übergibt bei einer Objektprüfung auch das zu prüfende Objekt. Richtig lautet die Signatur: def has_object_permission(self, request, view, obj):. Erst dadurch kann die Methode auf obj.owner zugreifen.',
+                'Welche zusätzlichen Informationen benötigt eine Objektprüfung gegenüber einer normalen View-Prüfung?'),
+
+            quiz('m10-8', 'Fremdes Eigentum',
+                 'Ein Benutzer darf seine eigenen Beiträge bearbeiten, aber nicht die Beiträge anderer Benutzer. Welche Prüfung gehört dafür in eine IsOwner-Permission?',
+                 [
+                     'return obj.owner == request.user',
+                     'return request.method == "POST"',
+                     'return request.user.is_staff',
+                     'return obj.owner is not None'
+                 ],
+                 0,
+                 'Der Vergleich obj.owner == request.user prüft, ob der angemeldete Benutzer tatsächlich Eigentümer des angeforderten Objekts ist. Eine solche Prüfung gehört in has_object_permission().',
+                 'Vergleiche den Eigentümer des Datensatzes mit dem aktuell angemeldeten Benutzer.')
+        ],
+    },
 ]
 
 EXERCISES = {ex['id']: ex for m in MISSIONS for ex in m['exercises']}
