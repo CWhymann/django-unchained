@@ -569,6 +569,211 @@ MISSIONS = [
                  'Vergleiche den Eigentümer des Datensatzes mit dem aktuell angemeldeten Benutzer.')
         ],
     },
+
+
+    {
+        'id': 'm11',
+        'title': 'Der Schlüssel zum Tresor',
+        'section': 'Backend 08 – Token Authentication',
+        'intro': 'Ein API-Zugang braucht einen Schlüssel. Du lernst Registrierung, Login und Token Authentication.',
+        'outro': 'Der Schlüssel sitzt. Deine API erkennt ihre Benutzer.',
+        'exercises': [
+            quiz('m11-1', 'Der persönliche Schlüssel',
+                 'Was ist die Aufgabe der Token Authentication?',
+                 ['Sie verschlüsselt die gesamte Datenbank',
+                  'Sie authentifiziert Requests anhand eines Tokens',
+                  'Sie ersetzt alle Django-Models',
+                  'Sie erstellt automatisch Benutzer'],
+                 1,
+                 'Der Client sendet bei geschützten Requests einen Token im Authorization-Header. Django REST Framework identifiziert damit den Benutzer.',
+                 'Der Client weist seine Identität mit einem Schlüssel nach.'),
+
+            fill('m11-2', 'Den Tresor vorbereiten',
+                 'Aktiviere die Token-App in Django.',
+                 "INSTALLED_APPS = [\n    'django.contrib.auth',\n    'rest_framework',\n    'rest_framework.[[1]]',\n]",
+                 [['authtoken']],
+                 'rest_framework.authtoken stellt die Token-Modelle und die dazugehörige Authentication bereit.',
+                 'Die App heißt authtoken.'),
+
+            order('m11-3', 'Die Schlüssel schmieden',
+                  'Bringe die Einrichtung der Token Authentication in die richtige Reihenfolge.',
+                  [
+                      {'id': 'a', 'text': "'rest_framework.authtoken' zu INSTALLED_APPS hinzufügen"},
+                      {'id': 'b', 'text': 'python manage.py migrate'},
+                      {'id': 'c', 'text': 'TokenAuthentication in REST_FRAMEWORK konfigurieren'},
+                      {'id': 'd', 'text': 'Geschützten API-Request mit Authorization-Header senden'}
+                  ],
+                  [['a', 'b', 'c', 'd']],
+                  'Zuerst wird die App aktiviert, dann werden die Datenbanktabellen angelegt. Danach wird die Authentifizierung konfiguriert und der Token verwendet.',
+                  'Ohne Migration existiert die Token-Tabelle noch nicht.'),
+
+            fill('m11-4', 'Den Eingang bewachen',
+                 'Ergänze den Authentication-Header für einen Token-Request.',
+                 "Authorization: [[1]] <dein-token>",
+                 [['Token']],
+                 'DRF erwartet bei der Standard-TokenAuthentication das Schema Token gefolgt vom Token-Schlüssel.',
+                 'Nicht Bearer, sondern Token.'),
+
+            quiz('m11-5', 'Die Registrierung',
+                 'Warum muss bei der Registrierung create_user() statt create() verwendet werden?',
+                 ['Weil create_user() das Passwort korrekt hasht',
+                  'Weil create() keine Datenbankeinträge erstellt',
+                  'Weil create_user() automatisch einen Admin erstellt',
+                  'Weil create() nur für GET funktioniert'],
+                 0,
+                 'create_user() verwendet set_password() und speichert das Passwort als sicheren Hash. create() würde das Passwort ohne zusätzliche Verarbeitung im Klartext speichern.',
+                 'Denke an die Passwortverschlüsselung.'),
+
+            bug('m11-6', 'Das Passwort liegt offen',
+                'Klicke die fehlerhafte Zeile bei der Registrierung.',
+                [
+                    'def register(request):',
+                    "    username = request.data['username']",
+                    "    password = request.data['password']",
+                    '    user = User.objects.create(',
+                    '        username=username,',
+                    '        password=password',
+                    '    )',
+                    '    return Response({"id": user.id})'
+                ],
+                [4, 6],
+                'User.objects.create() speichert das Passwort nicht automatisch als Hash. Verwende User.objects.create_user(username=username, password=password).',
+                'Ein Passwort darf niemals ungeschützt gespeichert werden.')
+        ],
+    },
+    {
+        'id': 'm12',
+        'title': 'Der API-Prüfstand',
+        'section': 'Backend 09 – Postman & API-Tests',
+        'intro': 'Ein Revolverheld prüft seine Waffe. Du prüfst deine API mit Postman: erfolgreiche und fehlerhafte Requests.',
+        'outro': 'Deine API ist getestet. Du weißt, wann sie trifft und wann sie abweist.',
+        'exercises': [
+            quiz('m12-1', 'Der erste Testschuss',
+                 'Wofür verwendest du Postman?',
+                 ['Zum Schreiben von Django-Models',
+                  'Zum Testen von HTTP-Requests und API-Antworten',
+                  'Zum Erstellen von CSS-Dateien',
+                  'Zum Starten der Datenbank'],
+                 1,
+                 'Postman ermöglicht das Senden von HTTP-Requests und die Prüfung von Statuscodes, Headern und Response-Bodies.',
+                 'Du testest damit deine API unabhängig vom Frontend.'),
+
+            fill('m12-2', 'Die richtige Adresse',
+                 'Ergänze die HTTP-Methode zum Abrufen einer Ressourcenliste.',
+                 '[[1]] http://localhost:8000/api/boards/',
+                 [['GET']],
+                 'GET ruft vorhandene Ressourcen ab. Es soll dabei keine neue Ressource angelegt werden.',
+                 'Lesen statt schreiben.'),
+
+            quiz('m12-3', 'Kein Schlüssel, kein Zutritt',
+                 'Was sollte eine geschützte API bei einem Request ohne gültige Authentifizierung zurückgeben?',
+                 ['200 OK',
+                  '201 Created',
+                  '401 Unauthorized',
+                  '404 Not Found'],
+                 2,
+                 'Eine nicht authentifizierte Anfrage an einen geschützten Endpunkt wird mit 401 beantwortet, wenn die verwendete Authentifizierungskonfiguration diesen Status vorsieht.',
+                 'Der Benutzer konnte seine Identität nicht nachweisen.'),
+
+            fill('m12-4', 'Den Token einsetzen',
+                 'Ergänze die Postman-Header für einen authentifizierten Request.',
+                 'Key: Authorization\nValue: [[1]] abc123token',
+                 [['Token']],
+                 'Der Header heißt Authorization. Der Wert beginnt bei DRFs TokenAuthentication mit Token und danach folgt der Schlüssel.',
+                 'Schema und Token werden durch ein Leerzeichen getrennt.'),
+
+            quiz('m12-5', 'Happy Path oder Fehler?',
+                 'Du sendest einen gültigen POST mit korrekten Daten. Die Ressource wird angelegt. Welcher Statuscode ist typisch?',
+                 ['200 OK',
+                  '201 Created',
+                  '401 Unauthorized',
+                  '404 Not Found'],
+                 1,
+                 '201 Created signalisiert, dass eine neue Ressource erfolgreich angelegt wurde.',
+                 'Die Ressource wurde neu erstellt.'),
+
+            order('m12-6', 'Die Teststrecke',
+                  'Bringe einen vollständigen API-Testablauf in die richtige Reihenfolge.',
+                  [
+                      {'id': 'a', 'text': 'Request-Methode und URL auswählen'},
+                      {'id': 'b', 'text': 'Authorization-Header mit Token setzen'},
+                      {'id': 'c', 'text': 'Request senden'},
+                      {'id': 'd', 'text': 'Statuscode und Response-Body prüfen'}
+                  ],
+                  [['a', 'b', 'c', 'd']],
+                  'Zuerst definierst du Request und URL, dann setzt du die Authentifizierung. Anschließend sendest du den Request und kontrollierst die Antwort.',
+                  'Die Antwort kannst du erst nach dem Absenden prüfen.')
+        ],
+    },
+    {
+        'id': 'm13',
+        'title': 'KanMind – Der letzte Auftrag',
+        'section': 'Backend 10 – Abschlussprojekt KanMind',
+        'intro': 'Der letzte Auftrag wartet. Verbinde Authentifizierung, Serializer, Views, Permissions und API-Tests zu einer funktionierenden Anwendung.',
+        'outro': 'Auftrag erledigt! Du hast Django REST Framework nicht nur verstanden, sondern kannst es einsetzen.',
+        'exercises': [
+            quiz('m13-1', 'Der Bauplan',
+                 'Welche Aufgabe hat ein Serializer in Django REST Framework?',
+                 ['Er verwaltet die URL-Routen',
+                  'Er wandelt Daten zwischen Python-Objekten und JSON um und validiert Eingaben',
+                  'Er startet den Server',
+                  'Er erstellt automatisch HTML-Seiten'],
+                 1,
+                 'Serializer übernehmen die Umwandlung und Validierung von Daten. ModelSerializer kann Felder eines Models automatisch abbilden.',
+                 'Denk an die Verbindung zwischen Model und JSON.'),
+
+            fill('m13-2', 'Das Board erstellen',
+                 'Ergänze den Serializer für ein Board-Model.',
+                 'class BoardSerializer(serializers.[[1]]):\n    class Meta:\n        model = Board\n        fields = [[2]]',
+                 [['ModelSerializer'], ['__all__']],
+                 'ModelSerializer erstellt die Felder anhand des Models. fields = "__all__" nimmt alle Model-Felder auf. In echten APIs sollten sensible Felder bewusst ausgeschlossen werden.',
+                 'Der Serializer soll direkt auf dem Model basieren.'),
+
+            quiz('m13-3', 'Wer darf das Board sehen?',
+                 'Welche Permission erlaubt nur authentifizierten Benutzern den Zugriff?',
+                 ['AllowAny',
+                  'IsAuthenticated',
+                  'IsAdminUser',
+                  'ReadOnly'],
+                 1,
+                 'IsAuthenticated verlangt einen angemeldeten Benutzer. Nicht angemeldete Benutzer erhalten keinen Zugriff auf den geschützten Endpunkt.',
+                 'Der Name der Permission verrät die Bedingung.'),
+
+            fill('m13-4', 'Die Eigentümerprüfung',
+                 'Ergänze die Objektberechtigung, damit nur der Besitzer ein Objekt bearbeiten darf.',
+                 'def has_object_permission(self, request, view, obj):\n    return obj.owner == [[1]]',
+                 [['request.user']],
+                 'request.user ist der aktuell authentifizierte Benutzer. Der Vergleich mit obj.owner prüft, ob der Benutzer Eigentümer des Objekts ist.',
+                 'Vergleiche den Besitzer mit dem angemeldeten Benutzer.'),
+
+            bug('m13-5', 'Das offene Tor',
+                'Ein fremder Benutzer kann ein Board bearbeiten. Klicke die fehlerhafte Zeile.',
+                [
+                    'class IsOwner(permissions.BasePermission):',
+                    '    def has_object_permission(self, request, view, obj):',
+                    '        if request.method in SAFE_METHODS:',
+                    '            return True',
+                    '        return True'
+                ],
+                [5],
+                'Die letzte Zeile erlaubt jedem Benutzer Änderungen. Richtig ist beispielsweise return obj.owner == request.user. Sichere Lesezugriffe und Schreibzugriffe müssen getrennt betrachtet werden.',
+                'Die letzte Zeile entscheidet über die Schreibberechtigung.'),
+
+            order('m13-6', 'Der letzte Auftrag',
+                  'Ordne die Bausteine eines typischen KanMind-API-Aufbaus.',
+                  [
+                      {'id': 'a', 'text': 'Models für Boards und Tasks definieren'},
+                      {'id': 'b', 'text': 'Serializer und Validierung erstellen'},
+                      {'id': 'c', 'text': 'Views und Permissions implementieren'},
+                      {'id': 'd', 'text': 'URLs und Router verbinden'},
+                      {'id': 'e', 'text': 'API mit Postman testen'}
+                  ],
+                  [['a', 'b', 'c', 'd', 'e']],
+                  'Die Datenstruktur bildet die Grundlage. Danach folgen Serialisierung, Zugriffskontrolle, Routing und abschließende API-Tests.',
+                  'Ohne Models gibt es keine Datenstruktur.')
+        ],
+    },
+
 ]
 
 EXERCISES = {ex['id']: ex for m in MISSIONS for ex in m['exercises']}
